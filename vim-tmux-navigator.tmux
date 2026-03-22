@@ -31,10 +31,7 @@ bind_key_vim() {
 
   vim_pattern="$(get_tmux_option "@vim_navigator_pattern" "${vim_pattern}")"
 
-  is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
-      | grep -iqE '^[^TXZ ]+ +"@vim_navigator_pattern"$'"
-  is_vim="$(get_tmux_option "@vim_navigator_check" "${is_vim}")"
-  is_vim="${is_vim//@vim_navigator_pattern/${vim_pattern}}"
+  is_vim="ps -p '#{@tmux-nav-vim-pid}'"
 
   tmux_navigator_disable_when_zoomed="$(get_tmux_option "@tmux_navigator_disable_when_zoomed" "0")"
   if [ "$tmux_navigator_disable_when_zoomed" = "1" ]; then
