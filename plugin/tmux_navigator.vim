@@ -104,18 +104,24 @@ function! s:TmuxSetVimPid()
   let s:tmux_pane_id = $TMUX_PANE
   call s:TmuxCommand("set-option -t " . s:tmux_pane_id .
         \" -p @tmux-nav-vim-pid " . getpid())
+  return ""
 endfunction
 
 function! s:TmuxUnsetVimPid()
   call s:TmuxCommand("set-option -t " . s:tmux_pane_id . " -up @tmux-nav-vim-pid")
+  return ""
 endfunction
 
 let s:tmux_is_last_pane = 0
 
+" Unset vim pid when using the :shell command
+cnoreabbrev <expr> shell getcmdtype() == ":" && getcmdline() == 'shell'
+      \? <SID>TmuxUnsetVimPid() . 'shell' : 'shell'
+
 augroup tmux_navigator
   au!
   autocmd WinEnter * let s:tmux_is_last_pane = 0
-  autocmd VimEnter * silent! call s:TmuxSetVimPid()
+  autocmd VimEnter,ShellCmdPost * silent! call s:TmuxSetVimPid()
   autocmd VimLeave * silent! call s:TmuxUnsetVimPid()
   if exists('##VimSuspend')
     autocmd VimResume * silent! call s:TmuxSetVimPid()
