@@ -115,8 +115,12 @@ let s:tmux_is_last_pane = 0
 augroup tmux_navigator
   au!
   autocmd WinEnter * let s:tmux_is_last_pane = 0
-  autocmd VimEnter,VimResume * silent! call s:TmuxSetVimPid()
-  autocmd VimLeave,VimSuspend * silent! call s:TmuxUnsetVimPid()
+  autocmd VimEnter * silent! call s:TmuxSetVimPid()
+  autocmd VimLeave * silent! call s:TmuxUnsetVimPid()
+  if exists('##VimSuspend')
+    autocmd VimResume * silent! call s:TmuxSetVimPid()
+    autocmd VimSuspend * silent! call s:TmuxUnsetVimPid()
+  endif
 augroup END
 
 function! s:NeedsVitalityRedraw()
