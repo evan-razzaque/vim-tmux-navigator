@@ -101,9 +101,9 @@ endfunction
 command! TmuxNavigatorProcessList call s:TmuxNavigatorProcessList()
 
 function! s:TmuxSetVimPid()
-  call s:TmuxCommand("set-option -p @tmux-nav-vim-pid " . getpid())
-  let s:tmux_pane_id = s:TmuxCommand("display-message -p '#{pane_id}'")
-  let s:tmux_pane_id = substitute(s:tmux_pane_id, '\n', '', '')
+  let s:tmux_pane_id = $TMUX_PANE
+  call s:TmuxCommand("set-option -t " . s:tmux_pane_id .
+        \" -p @tmux-nav-vim-pid " . getpid())
 endfunction
 
 function! s:TmuxUnsetVimPid()
