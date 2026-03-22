@@ -100,10 +100,23 @@ function! s:TmuxNavigatorProcessList()
 endfunction
 command! TmuxNavigatorProcessList call s:TmuxNavigatorProcessList()
 
+function! s:TmuxSetVimPid()
+  call s:TmuxCommand("set-option -p @tmux-nav-vim-pid " . getpid())
+  let s:tmux_pane_id = s:TmuxCommand("display-message -p '#{pane_id}'")
+  let s:tmux_pane_id = substitute(s:tmux_pane_id, '\n', '', '')
+endfunction
+
+function! s:TmuxUnsetVimPid()
+  call s:TmuxCommand("set-option -t " . s:tmux_pane_id . " -up @tmux-nav-vim-pid")
+endfunction
+
 let s:tmux_is_last_pane = 0
+
 augroup tmux_navigator
   au!
   autocmd WinEnter * let s:tmux_is_last_pane = 0
+  autocmd VimEnter,VimResume * silent! call s:TmuxSetVimPid()
+  autocmd VimLeave,VimSuspend * silent! call s:TmuxUnsetVimPid()
 augroup END
 
 function! s:NeedsVitalityRedraw()
