@@ -31,7 +31,7 @@ bind_key_vim() {
 
   vim_pattern="$(get_tmux_option "@vim_navigator_pattern" "${vim_pattern}")"
 
-  is_vim="ps -p '#{@tmux-nav-vim-pid}'"
+  is_vim='ps -p #{@tmux-nav-vim-pid}'
 
   tmux_navigator_disable_when_zoomed="$(get_tmux_option "@tmux_navigator_disable_when_zoomed" "0")"
   if [ "$tmux_navigator_disable_when_zoomed" = "1" ]; then
@@ -39,7 +39,11 @@ bind_key_vim() {
   fi
 
   # sending C-/ according to https://github.com/tmux/tmux/issues/1827
-  tmux bind-key -n "$key" if-shell "$is_vim" "send-keys '$key'" "$tmux_cmd"
+  tmux bind-key -n "$key" if-shell -F '#{@tmux-nav-vim-pid}'\
+      "if-shell '$is_vim' 'send-keys $key'\
+          'set -up @tmux-nav-vim-pid; $tmux_cmd'"\
+      "$tmux_cmd"
+
   # tmux < 3.0 cannot parse "$tmux_cmd" as one argument, thus copying as multiple arguments
   tmux bind-key -T copy-mode-vi "$key" $tmux_cmd
 }
